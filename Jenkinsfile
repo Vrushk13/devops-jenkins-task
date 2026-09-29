@@ -1,23 +1,51 @@
-node {
-agent any{
+```groovy
+pipeline {
+    agent any
 
-  stage('Build') {
-        echo 'Building the application...'
-        sh 'ls -la'
-    }
+    stages {
 
-    stage('Test') {
-        echo 'Testing the application...'
-        sh 'python3 --version'
-    }
+        stage('Build') {
+            steps {
+                echo 'Building the application...'
+                sh 'ls -la'
+            }
+        }
 
-    stage('Docker Check') {
-        echo 'Checking Docker...'
-        sh 'docker --version'
-        sh 'test -f Dockerfile'
-    }
+        stage('Test') {
+            steps {
+                echo 'Testing the application...'
+                sh 'python3 --version'
+                sh 'python3 -m py_compile app.py'
+            }
+        }
 
-    stage('Finish') {
-        echo 'Jenkins pipeline completed successfully!'
+        stage('Docker Check') {
+            steps {
+                echo 'Checking Docker...'
+                sh 'docker --version'
+                sh 'test -f Dockerfile'
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                echo 'Building Docker image...'
+                sh 'docker build -t app-image-secure:latest .'
+            }
+        }
+
+        stage('Security Scan') {
+            steps {
+                echo 'Scanning Docker image with Trivy...'
+                sh 'trivy image --scanners vuln --severity HIGH,CRITICAL app-image-secure:latest'
+            }
+        }
+
+        stage('Finish') {
+            steps {
+                echo 'Jenkins pipeline completed successfully!'
+            }
+        }
     }
 }
+

@@ -1,0 +1,44 @@
+pipeline {
+agent any
+
+stages {
+
+    stage('Build') {
+        steps {
+            echo 'Building the application...'
+            sh 'ls -la'
+        }
+    }
+
+    stage('Test') {
+        steps {
+            echo 'Testing the application...'
+            sh 'python3 --version'
+            sh 'python3 -m py_compile app.py'
+        }
+    }
+
+    stage('Docker Check') {
+        steps {
+            echo 'Checking Docker...'
+            sh 'docker --version'
+            sh 'test -f Dockerfile'
+        }
+    }
+
+    stage('Docker Build') {
+        steps {
+            echo 'Building Docker image...'
+            sh 'docker build -t app-image .'
+        }
+    }
+
+    stage('Finish') {
+        steps {
+            echo 'Jenkins pipeline completed successfully!'
+        }
+    }
+}
+
+}
+
