@@ -1,0 +1,25 @@
+services:
+  app:
+    image: app-image:latest
+    container_name: devops-app
+
+    ports:
+      - "3005:3000"
+
+    restart: unless-stopped
+
+    security_opt:
+      - no-new-privileges:true
+
+    cap_drop:
+      - ALL
+
+    read_only: true
+
+    tmpfs:
+      - /tmp
+
+    user: "appuser"
+
+    environment:
+      APP_ENV: production
