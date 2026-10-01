@@ -33,6 +33,18 @@ pipeline {
                 sh 'docker build -t app-image-secure:latest .'
             }
         }
+        stage('Health Check') {
+            steps {
+                echo 'Starting application health check...'
+                sh '''
+                    docker rm -f health-check-test 2>/dev/null || true
+                    docker run -d --name health-check-test -p 3010:3000 app-image-secure:latest
+                    sleep 5
+                    curl -f http://localhost:3010/
+                    docker rm -f health-check-test
+                '''
+            }
+        }
 
         stage('Security Scan') {
             steps {
